@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sri Lanka's First Medical Cyclotron Facility - Feasibility Study</title>
+  <meta name="description" content="Comprehensive feasibility study for establishing Sri Lanka's first medical cyclotron facility for PET radiotracer production">
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- External Libraries -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      scroll-behavior: smooth;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Roboto Slab', serif;
+    }
+    
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: #e5e7eb;
+      z-index: 50;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: #1976D2;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 40;
+      padding: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    
+    .nav-link {
+      color: #666;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .nav-link:hover {
+      color: #1976D2;
+    }
+    
+    .download-btn {
+      background: #1976D2;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+    
+    .download-btn:hover {
+      background: #1565C0;
+    }
+    
+    .hero {
+      background: linear-gradient(135deg, #1976D2 0%, #4CAF50 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+    
+    .hero-content {
+      max-width: 800px;
+      padding: 0 2rem;
+    }
+    
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: fadeInUp 1s ease;
+    }
+    
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+      animation: fadeInUp 1s ease 0.2s both;
+    }
+    
+    .hero-btn {
+      background: white;
+      color: #1976D2;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      animation: fadeInUp 1s ease 0.4s both;
+    }
+    
+    .hero-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .section {
+      padding: 5rem 0;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+    
+    .section:nth-child(even) {
+      background: #f8f9fa;
+    }
+    
+    .section-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      color: #333;
+    }
+    
+    .grid {
+      display: grid;
+      gap: 2rem;
+    }
+    
+    .grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    
+    .card-icon {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    
+    .blue { background: #E3F2FD; color: #1976D2; }
+    .green { background: #E8F5E8; color: #4CAF50; }
+    .orange { background: #FFF3E0; color: #FF9800; }
+    .red { background: #FFEBEE; color: #F44336; }
+    
+    .map-container {
+      height: 400px;
+      border-radius: 1rem;
+      overflow: hidden;
+      margin: 2rem 0;
+    }
+    
+    .chart-container {
+      height: 300px;
+      margin: 2rem 0;
+    }
+    
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+    
+    .before-after {
+      padding: 2rem;
+      border-radius: 1rem;
+    }
+    
+    .before {
+      background: #FFEBEE;
+      border-left: 4px solid #F44336;
+    }
+    
+    .after {
+      background: #E8F5E8;
+      border-left: 4px solid #4CAF50;
+    }
+    
+    .footer {
+      background: #333;
+      color: white;
+      text-align: center;
+      padding: 3rem 0;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s ease;
+    }
+    
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .hero h1 {
+        font-size: 2rem;
+      }
+      
+      .comparison {
+        grid-template-columns: 1fr;
+      }
+      
+      .section {
+        padding: 3rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Progress Bar -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-container">
+      <div class="nav-logo">
+        🧬 Medical Cyclotron Study
+      </div>
+      <div class="nav-links">
+        <a href="#overview" class="nav-link">Overview</a>
+        <a href="#technical" class="nav-link">Technical</a>
+        <a href="#economic" class="nav-link">Economic</a>
+        <a href="#location" class="nav-link">Location</a>
+        <a href="#implementation" class="nav-link">Implementation</a>
+      </div>
+      <button class="download-btn" onclick="generatePDF()">📄 Download PDF</button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Sri Lanka's First Medical Cyclotron Facility</h1>
+      <p>Comprehensive Feasibility Study for Establishing Local PET Radiotracer Production</p>
+      <button class="hero-btn" onclick="scrollToSection('overview')">Explore Study</button>
+    </div>
+  </section>
+
+  <!-- Overview Section -->
+  <section id="overview" class="section">
+    <h2 class="section-title fade-in">Project Overview</h2>
+    <div class="grid grid-3">
+      <div class="card fade-in">
+        <div class="card-icon red">⚠️</div>
+        <h3 class="card-title">Limited Access</h3>
+        <p>Only 1 PET scanner currently operational in Sri Lanka, severely limiting diagnostic capabilities</p>
+      </div>
+      <div class="card fade-in">
+        <div class="card-icon orange">💰</div>
+        <h3 class="card-title">High Costs</h3>
+        <p>Patients pay $500–800 per scan due to complex import logistics and limited supply</p>
+      </div>
+      <div class="card fade-in">
+        <div class="card-icon blue">⏰</div>
+        <h3 class="card-title">Delays</h3>
+        <p>Import dependencies cause significant delays and dose uncertainty for time-critical diagnostics</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Section -->
+  <section id="technical" class="section">
+    <h2 class="section-title fade-in">Technical Requirements</h2>
+    <div class="grid grid-2">
+      <div class="card fade-in">
+        <div class="card-icon blue">⚙️</div>
+        <h3 class="card-title">Cyclotron Options</h3>
+        <ul>
+          <li><strong>Compact Self-Shielded:</strong> Lower infrastructure requirements</li>
+          <li><strong>Conventional Bunker:</strong> Higher capacity, specialized construction</li>
+        </ul>
+      </div>
+      <div class="card fade-in">
+        <div class="card-icon green">🏗️</div>
+        <h3 class="card-title">Critical Infrastructure</h3>
+        <ul>
+          <li>1.5–2.5m borated concrete shielding walls</li>
+          <li>Specialized ventilation and gas filtration systems</li>
+          <li>Automated radiochemistry synthesis suites</li>
+          <li>Complex laboratory instrumentation</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Economic Section -->
+  <section id="economic" class="section">
+    <h2 class="section-title fade-in">Economic Feasibility</h2>
+    <div class="grid grid-2">
+      <div class="fade-in">
+        <div class="card blue">
+          <h3 class="card-title">Investment Overview</h3>
+          <div class="grid grid-2">
+            <div>
+              <div style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">LKR 2.25-3.15B</div>
+              <div>Capital Investment</div>
+              <div style="font-size: 0.9rem; opacity: 0.8;">($7.5-10.5 Million USD)</div>
+            </div>
+            <div>
+              <div style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">5-7 Years</div>
+              <div>Break-even Period</div>
+              <div style="font-size: 0.9rem; opacity: 0.8;">Based on current demand</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fade-in">
+        <div class="chart-container">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Location Section -->
+  <section id="location" class="section">
+    <h2 class="section-title fade-in">Strategic Location Analysis</h2>
+    <div class="grid grid-2">
+      <div class="card fade-in">
+        <h3 class="card-title">Selection Criteria</h3>
+        <div style="margin-top: 1rem;">
+          <div style="margin-bottom: 1rem;">
+            <div class="card-icon blue" style="display: inline-block; width: 2rem; height: 2rem; margin-right: 1rem;">🏥</div>
+            <strong>Hospital Proximity:</strong> Close to major medical centers
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <div class="card-icon green" style="display: inline-block; width: 2rem; height: 2rem; margin-right: 1rem;">⚡</div>
+            <strong>Power Infrastructure:</strong> Robust electricity supply (&gt;500kVA)
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <div class="card-icon orange" style="display: inline-block; width: 2rem; height: 2rem; margin-right: 1rem;">✈️</div>
+            <strong>Airport Access:</strong> Near Bandaranaike International Airport
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <div class="card-icon blue" style="display: inline-block; width: 2rem; height: 2rem; margin-right: 1rem;">🎓</div>
+            <strong>Academic Partners:</strong> Universities for research and development
+          </div>
+        </div>
+      </div>
+      <div class="fade-in">
+        <h3 class="card-title">Proposed Locations</h3>
+        <div class="map-container" id="mapContainer"></div>
+        <div class="grid grid-2" style="margin-top: 1rem;">
+          <div class="card green">
+            <strong>Colombo Metro (Preferred):</strong> Optimal infrastructure and accessibility
+          </div>
+          <div class="card blue">
+            <strong>Gampaha District:</strong> Good airport access, expanding facilities
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clinical Impact Section -->
+  <section class="section">
+    <h2 class="section-title fade-in">Clinical Impact</h2>
+    <div class="comparison fade-in">
+      <div class="before-after before">
+        <h3>❌ Current System</h3>
+        <ul>
+          <li>Significant delays due to import logistics</li>
+          <li>Dose uncertainty affecting diagnostic accuracy</li>
+          <li>High costs ($500-800 per scan) limiting access</li>
+          <li>Limited access for most patients nationwide</li>
+        </ul>
+      </div>
+      <div class="before-after after">
+        <h3>✅ With Cyclotron Facility</h3>
+        <ul>
+          <li>Same-day radiotracer supply and PET scans</li>
+          <li>Reliable, consistent dose quality</li>
+          <li>Reduced costs making scans more accessible</li>
+          <li>Expanded access for Sri Lankan patients</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="grid grid-3" style="margin-top: 3rem;">
+      <div class="card blue fade-in">
+        <div class="card-icon blue">🎯</div>
+        <h3 class="card-title">Oncology</h3>
+        <p>Early cancer detection, staging, treatment monitoring, and recurrence assessment</p>
+      </div>
+      <div class="card fade-in" style="background: #F3E5F5;">
+        <div class="card-icon" style="background: #E1BEE7; color: #7B1FA2;">🧠</div>
+        <h3 class="card-title">Neurology</h3>
+        <p>Alzheimer's disease, epilepsy, brain tumors, and neurological disorder diagnosis</p>
+      </div>
+      <div class="card red fade-in">
+        <div class="card-icon red">❤️</div>
+        <h3 class="card-title">Cardiology</h3>
+        <p>Myocardial perfusion, coronary artery disease, and cardiac viability assessment</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Implementation Section -->
+  <section id="implementation" class="section">
+    <h2 class="section-title fade-in">Implementation Roadmap</h2>
+    <div class="grid grid-3">
+      <div class="card blue fade-in">
+        <div class="card-icon blue">1️⃣</div>
+        <h3 class="card-title">Phase 1: Planning (12-18 months)</h3>
+        <ul>
+          <li>Detailed feasibility study</li>
+          <li>Regulatory approvals (SLAEA)</li>
+          <li>Site selection and acquisition</li>
+          <li>Funding arrangement</li>
+        </ul>
+      </div>
+      <div class="card green fade-in">
+        <div class="card-icon green">2️⃣</div>
+        <h3 class="card-title">Phase 2: Construction (18-24 months)</h3>
+        <ul>
+          <li>Facility construction</li>
+          <li>Equipment installation</li>
+          <li>Staff recruitment & training</li>
+          <li>Commissioning with F-18 FDG</li>
+        </ul>
+      </div>
+      <div class="card orange fade-in">
+        <div class="card-icon orange">3️⃣</div>
+        <h3 class="card-title">Phase 3: Scale-up (Ongoing)</h3>
+        <ul>
+          <li>Operational scale-up</li>
+          <li>Specialized tracer development</li>
+          <li>Regional distribution network</li>
+          <li>Research partnerships</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Conclusion Section -->
+  <section class="section" style="background: linear-gradient(135deg, #1976D2 0%, #4CAF50 100%); color: white;">
+    <h2 class="section-title fade-in">Recommendations & Conclusion</h2>
+    <div class="grid grid-2">
+      <div class="fade-in">
+        <h3 style="font-size: 1.5rem; margin-bottom: 2rem;">Key Recommendations</h3>
+        <div style="margin-bottom: 1.5rem;">
+          <strong>📍 Prioritize Colombo Location:</strong> Metropolitan area offers optimal infrastructure
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <strong>🤝 Multi-source Funding:</strong> Secure government partnerships and international support
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <strong>🎓 Workforce Development:</strong> Emphasize training programs and academic partnerships
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <strong>📊 Performance Monitoring:</strong> Track utilization, access, cost-effectiveness, and safety
+        </div>
+      </div>
+      <div class="card fade-in" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+        <h3 style="color: white; text-align: center; margin-bottom: 2rem;">Project Impact</h3>
+        <div class="grid grid-2">
+          <div style="text-align: center;">
+            <div style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">5-7 Years</div>
+            <div style="opacity: 0.9;">Break-even Timeline</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">National</div>
+            <div style="opacity: 0.9;">Healthcare Impact</div>
+          </div>
+        </div>
+        <div style="margin-top: 2rem; text-align: center; opacity: 0.9;">
+          This project represents a crucial step forward in establishing Sri Lanka as a regional leader in advanced medical technology.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div>
+      <h3>Medical Cyclotron Feasibility Study</h3>
+      <p>BSc Biomedical Engineering Final Project</p>
+      <p>Created by Ushani • Project IDs: D/BMT/22/0003, D/BMT/22/0008, D/BMT/22/0010</p>
+      <p>&copy; 2025 All rights reserved</p>
+    </div>
+  </footer>
+
+  <script>
+    // Progress Bar
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      document.getElementById('progressFill').style.width = progress + '%';
+    }
+    
+    // Smooth scrolling
+    function scrollToSection(sectionId) {
+      document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Intersection Observer for animations
+    function observeElements() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    }
+    
+    // Initialize Map
+    function initMap() {
+      const map = L.map('mapContainer').setView([7.8731, 80.7718], 7);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      
+      const locations = [
+        { coords: [6.9271, 79.8612], name: "Colombo Metro", color: "green" },
+        { coords: [7.0873, 79.9250], name: "Gampaha District", color: "blue" },
+        { coords: [7.2906, 80.6337], name: "Kandy", color: "orange" },
+        { coords: [6.0535, 80.2210], name: "Galle", color: "purple" }
+      ];
+      
+      locations.forEach(location => {
+        L.circleMarker(location.coords, {
+          color: location.color,
+          fillColor: location.color,
+          fillOpacity: 0.8,
+          radius: location.name === 'Colombo Metro' ? 12 : 8
+        }).addTo(map).bindPopup(`<strong>${location.name}</strong>`);
+      });
+    }
+    
+    // Initialize Chart
+    function initChart() {
+      const ctx = document.getElementById('revenueChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6', 'Year 7'],
+          datasets: [{
+            label: 'Revenue (LKR Millions)',
+            data: [250, 400, 600, 800, 1000, 1200, 1400],
+            borderColor: '#1976D2',
+            backgroundColor: 'rgba(25, 118, 210, 0.1)',
+            tension: 0.4,
+            fill: true
+          }, {
+            label: 'Costs (LKR Millions)',
+            data: [800, 600, 550, 500, 480, 460, 450],
+            borderColor: '#FF6F00',
+            backgroundColor: 'rgba(255, 111, 0, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { y: { beginAtZero: true } },
+          plugins: {
+            legend: { position: 'top' },
+            title: { display: true, text: '7-Year Financial Projection' }
+          }
+        }
+      });
+    }
+    
+    // PDF Generation
+    function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      doc.setFontSize(20);
+      doc.text('Feasibility Study: Sri Lanka\'s First Medical Cyclotron Facility', 20, 30);
+      
+      doc.setFontSize(12);
+      let y = 50;
+      
+      const sections = [
+        'Project Overview',
+        'Current challenges with limited PET scanner access and high costs',
+        '',
+        'Technical Requirements', 
+        'Compact self-shielded cyclotron with specialized infrastructure',
+        '',
+        'Economic Analysis',
+        'Capital cost: LKR 2.25-3.15 billion, Break-even: 5-7 years',
+        '',
+        'Location Strategy',
+        'Colombo metro preferred for optimal infrastructure and accessibility',
+        '',
+        'Clinical Benefits',
+        'Same-day PET scans, reduced costs, improved diagnostic accuracy',
+        '',
+        'Implementation Plan',
+        'Three-phase approach over 3-4 years for full deployment',
+        '',
+        'Recommendations',
+        'Prioritize Colombo location with multi-source funding approach',
+        '',
+        'Conclusion',
+        'Strategic step forward for Sri Lanka\'s nuclear medicine capability'
+      ];
+      
+      sections.forEach(section => {
+        if (section === '') {
+          y += 10;
+        } else if (section.includes('Overview') || section.includes('Requirements') || 
+                  section.includes('Analysis') || section.includes('Strategy') ||
+                  section.includes('Benefits') || section.includes('Plan') || 
+                  section.includes('Recommendations') || section.includes('Conclusion')) {
+          doc.setFontSize(14);
+          doc.setFont(undefined, 'bold');
+          doc.text(section, 20, y);
+          doc.setFont(undefined, 'normal');
+          doc.setFontSize(12);
+          y += 15;
+        } else {
+          doc.text(section, 25, y);
+          y += 10;
+        }
+        
+        if (y > 250) {
+          doc.addPage();
+          y = 30;
+        }
+      });
+      
+      doc.setFontSize(10);
+      doc.text('© 2025 | Created by Ushani for BSc Biomedical Engineering Final Project', 20, 280);
+      doc.text('Project IDs: D/BMT/22/0003, D/BMT/22/0008, D/BMT/22/0010', 20, 285);
+      
+      doc.save('sri-lanka-medical-cyclotron-feasibility-study.pdf');
+    }
+    
+    // Event listeners
+    window.addEventListener('scroll', updateProgress);
+    window.addEventListener('load', () => {
+      observeElements();
+      initMap();
+      initChart();
+    });
+  </script>
+</body>
+</html>
